@@ -11,3 +11,22 @@ export const shuffleArray = (data) => {
 	}
 	return array;
 };
+
+export const getOptions = (sentence, allWords) => {
+	let wordsInSentence = sentence.secondSentence.split(' ');
+	const sentenceLength = wordsInSentence.length;
+	while (wordsInSentence.length < 6 || wordsInSentence.length < sentenceLength + 2) {
+		const word = getRandom(allWords);
+		if (!wordsInSentence.includes(word.secondWord)) {
+			wordsInSentence.push(word.secondWord);
+		}
+	}
+	wordsInSentence = wordsInSentence.map((ele, index) => {
+		return {
+			name: ele,
+			id: index
+		};
+	});
+	wordsInSentence = shuffleArray(wordsInSentence);
+	return wordsInSentence;
+};

@@ -15,7 +15,7 @@
 </script>
 
 <script>
-	import { getRandom, shuffleArray } from '../utils/random.js';
+	import { getRandom, getOptions } from '../utils/random.js';
 	import { quintOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
@@ -52,21 +52,9 @@
 			secondWord: word.secondWord
 		};
 	});
-	const sentence = getRandom(allSentences);
-	let wordsInSentence = sentence.secondSentence.split(' ');
-	while (wordsInSentence.length < 6) {
-		const word = getRandom(allWords);
-		if (!wordsInSentence.includes(word.secondWord)) {
-			wordsInSentence.push(word.secondWord);
-		}
-	}
-	wordsInSentence = wordsInSentence.map((ele, index) => {
-		return {
-			name: ele,
-			id: index
-		};
-	});
-	wordsInSentence = shuffleArray(wordsInSentence);
+	let sentence = getRandom(allSentences);
+	let wordsInSentence = getOptions(sentence, allWords);
+
 	let ans = [];
 	const handleOptionsWordClick = (word) => {
 		ans = [...ans, word];
@@ -76,13 +64,28 @@
 		ans = ans.filter((ele) => ele !== word);
 		wordsInSentence = [...wordsInSentence, word];
 	};
+	let isChecked = false;
+	let isCorrect = false;
+	const checkAns = () => {
+		let ansString = ans.map((ele) => ele.name).join(' ');
+		if (ansString === sentence.secondSentence) {
+			isCorrect = true;
+		}
+		isChecked = true;
+	};
+
+	const handleNext = () => {
+		sentence = getRandom(allSentences);
+		wordsInSentence = getOptions(sentence, allWords);
+		ans = [];
+		isCorrect = false;
+		isChecked = false;
+	};
 </script>
 
 <section>
 	<h2>{sentence.firstSentence}</h2>
-	<p>Translate this by choosing from below</p>
 	<div class="selected">
-		The answer is
 		{#each ans as wordObj (wordObj.id)}
 			<div
 				in:receive={{ key: wordObj.id }}
@@ -106,6 +109,18 @@
 			</div>
 		{/each}
 	</div>
+	<button on:click={checkAns}>Check</button>
+	{#if isChecked}
+		{#if isCorrect}
+			<div class="correctAns">Congratulations! Correct Answer</div>
+		{:else}
+			<div class="wrongAns">
+				Oops Wrong Answer, The correct answer is - {sentence.secondSentence}
+			</div>
+		{/if}
+
+		<button on:click={handleNext}>Next</button>
+	{/if}
 </section>
 
 <style>
@@ -122,6 +137,11 @@
 	.selected {
 		display: flex;
 		flex-wrap: wrap;
+		border-top: 1px solid rgba(0, 0, 0, 0.1);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		height: 68px;
+		box-sizing: border-box;
+		width: 80%;
 	}
 	.options {
 		display: flex;
@@ -129,9 +149,16 @@
 	}
 	.selected > div,
 	.options > div {
-		padding: 0.5rem;
+		padding: 0.75rem;
 		background-color: #333;
 		color: #fff;
-		margin: 0.5rem;
+		margin: 0.75rem;
+		border-radius: 4px;
+	}
+	.correctAns {
+		color: green;
+	}
+	.wrongAns {
+		color: red;
 	}
 </style>
