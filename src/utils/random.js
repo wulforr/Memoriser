@@ -1,5 +1,8 @@
-export const getRandom = (data) => {
-	const randomIndex = Math.floor(Math.random() * data.length);
+export const getRandom = (data, index = -1) => {
+	let randomIndex = Math.floor(Math.random() * data.length);
+	while (randomIndex === index) {
+		randomIndex = Math.floor(Math.random() * data.length);
+	}
 	return data[randomIndex];
 };
 

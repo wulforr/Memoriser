@@ -1,9 +1,11 @@
 <script context="module">
 	export async function load({ fetch }) {
+		const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
 		console.log('running load function');
-		const sentenceApiCall = fetch('http://localhost:1337/sentences');
-		const wordsApiCall = fetch('http://localhost:1337/words');
+		const sentenceApiCall = fetch(`${BASE_URL}/sentences`);
+		const wordsApiCall = fetch(`${BASE_URL}/words`);
 		const response = await Promise.all([sentenceApiCall, wordsApiCall]);
+		// console.log('response', response);
 		const data = await Promise.all(response.map((r) => r.json()));
 
 		return {
@@ -19,6 +21,11 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+	import { onDestroy } from 'svelte';
+
+	onDestroy(() => {
+		console.log('destroyin learn');
+	});
 
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
@@ -28,7 +35,7 @@
 			const transform = style.transform === 'none' ? '' : style.transform;
 
 			return {
-				duration: 600,
+				duration: 500,
 				easing: quintOut,
 				css: (t) => `
 					transform: ${transform} scale(${t});
@@ -68,14 +75,14 @@
 	let isCorrect = false;
 	const checkAns = () => {
 		let ansString = ans.map((ele) => ele.name).join(' ');
-		if (ansString === sentence.secondSentence) {
+		if (ansString.toLowerCase() === sentence.secondSentence.toLowerCase()) {
 			isCorrect = true;
 		}
 		isChecked = true;
 	};
 
 	const handleNext = () => {
-		sentence = getRandom(allSentences);
+		sentence = getRandom(allSentences, allSentences.indexOf(sentence));
 		wordsInSentence = getOptions(sentence, allWords);
 		ans = [];
 		isCorrect = false;
@@ -88,8 +95,8 @@
 	<div class="selected">
 		{#each ans as wordObj (wordObj.id)}
 			<div
-				in:receive={{ key: wordObj.id }}
-				out:send={{ key: wordObj.id }}
+				in:receive|local={{ key: wordObj.id }}
+				out:send|local={{ key: wordObj.id }}
 				animate:flip={{ duration: 200 }}
 				on:click={() => handleAnsWordClick(wordObj)}
 			>
@@ -100,8 +107,8 @@
 	<div class="options">
 		{#each wordsInSentence as wordObj (wordObj.id)}
 			<div
-				in:receive={{ key: wordObj.id }}
-				out:send={{ key: wordObj.id }}
+				in:receive|local={{ key: wordObj.id }}
+				out:send|local={{ key: wordObj.id }}
 				animate:flip={{ duration: 200 }}
 				on:click={() => handleOptionsWordClick(wordObj)}
 			>
@@ -109,7 +116,6 @@
 			</div>
 		{/each}
 	</div>
-	<button on:click={checkAns}>Check</button>
 	{#if isChecked}
 		{#if isCorrect}
 			<div class="correctAns">Congratulations! Correct Answer</div>
@@ -118,8 +124,9 @@
 				Oops Wrong Answer, The correct answer is - {sentence.secondSentence}
 			</div>
 		{/if}
-
 		<button on:click={handleNext}>Next</button>
+	{:else}
+		<button on:click={checkAns}>Check</button>
 	{/if}
 </section>
 
@@ -131,8 +138,9 @@
 		align-items: center;
 	}
 	h2 {
-		font-size: 1.5rem;
+		font-size: 2rem;
 		color: #333;
+		font-weight: bold;
 	}
 	.selected {
 		display: flex;
@@ -157,8 +165,25 @@
 	}
 	.correctAns {
 		color: green;
+		font-size: 1.25rem;
+		margin-top: 1rem;
 	}
 	.wrongAns {
 		color: red;
+		font-size: 1.25rem;
+		margin-top: 1rem;
+	}
+	button {
+		padding: 0.75rem 1.5rem;
+		border-radius: 4px;
+		margin-top: 1rem;
+		background-color: transparent;
+		border: 2px solid #333;
+		cursor: pointer;
+	}
+	button:hover {
+		background-color: rgb(105, 128, 243);
+		color: #fff;
+		border: 2px solid rgb(105, 128, 243);
 	}
 </style>
