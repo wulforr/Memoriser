@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { setCookie } from '../utils/cookie.js';
 	export let toggleShowLogin;
 	let username = '';
 	let email = '';
@@ -30,6 +31,11 @@
 		const data = await response.json();
 		console.log('response', response, data);
 		if (response.status === 200) {
+			setCookie(
+				'userToken',
+				{ jwt: data.jwt, userId: data.user.id, userName: data.user.username },
+				30
+			);
 			goto('/');
 		}
 	};
