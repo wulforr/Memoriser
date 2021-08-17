@@ -1,14 +1,50 @@
 <script>
+	import { goto } from '$app/navigation';
+	import { setCookie } from '../utils/cookie.js';
 	export let toggleShowLogin;
 	let email = '';
 	let password = '';
+	let error = '';
+
+	const handleLogin = async () => {
+		if (email.length === 0) {
+			error = 'email must not be empty';
+			return;
+		} else if (password.length === 0) {
+			error = 'Password must not be empty';
+			return;
+		} else if (password.length < 4) {
+			error = 'Password must be greater than 4 characters';
+			return;
+		}
+		console.log(email, password);
+		const response = await fetch('https://memoriser-strapiapi.el.r.appspot.com/auth/local', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				identifier: email,
+				password
+			})
+		});
+		const data = await response.json();
+		console.log('response', response, data);
+		if (response.status === 200) {
+			setCookie(
+				'userToken',
+				{ jwt: data.jwt, userId: data.user.id, userName: data.user.username },
+				30
+			);
+			goto('/');
+		}
+	};
 </script>
 
 <div>
 	<h1>Login</h1>
 	<input type="email" bind:value={email} placeholder="Enter your email" />
 	<input type="password" bind:value={password} placeholder="Enter your password" />
-	<button>Login</button>
+	<p class="error">{error}</p>
+	<button on:click={handleLogin}>Login</button>
 	<p>Dont have an account? <span on:click={() => toggleShowLogin()}>register</span></p>
 </div>
 
@@ -39,5 +75,8 @@
 	}
 	span {
 		color: var(--accent-color);
+	}
+	.error {
+		color: red;
 	}
 </style>

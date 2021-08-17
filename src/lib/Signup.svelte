@@ -46,7 +46,7 @@
 	<input type="text" bind:value={username} placeholder="Enter your username" />
 	<input type="email" bind:value={email} placeholder="Enter your email" />
 	<input type="password" bind:value={password} placeholder="Enter your password" />
-	<p>{error}</p>
+	<p class="error">{error}</p>
 	<button on:click={handleSignUp}>Signup</button>
 	<p>Already have an account? <span on:click={() => toggleShowLogin()}>Login</span></p>
 </div>
@@ -78,5 +78,8 @@
 	}
 	span {
 		color: var(--accent-color);
+	}
+	.error {
+		color: red;
 	}
 </style>

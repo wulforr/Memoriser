@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	export let userName;
 </script>
 
 <header>
@@ -13,7 +14,13 @@
 		<ul>
 			<li class:active={$page.path === '/'}><a sveltekit:prefetch href="/">Home</a></li>
 			<li class:active={$page.path === '/learn'}><a sveltekit:prefetch href="/learn">Learn</a></li>
-			<li class:active={$page.path === '/auth'}><a sveltekit:prefetch href="/auth">Login</a></li>
+			{#if userName}
+				<li class:active={$page.path === '/profile'}>
+					<a sveltekit:prefetch href="/profile">{userName}</a>
+				</li>
+			{:else}
+				<li class:active={$page.path === '/auth'}><a sveltekit:prefetch href="/auth">Login</a></li>
+			{/if}
 		</ul>
 	</nav>
 </header>

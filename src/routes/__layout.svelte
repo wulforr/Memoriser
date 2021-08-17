@@ -1,9 +1,24 @@
+<script context="module">
+	export async function load({ session }) {
+		if (session) {
+			// console.log('session in layout', session, JSON.parse(session.userToken).userName);
+			return {
+				props: {
+					userName: JSON.parse(session.userToken).userName
+				}
+			};
+		}
+		return {};
+	}
+</script>
+
 <script>
 	import Header from '$lib/header/Header.svelte';
 	import '../app.css';
+	export let userName;
 </script>
 
-<Header />
+<Header {userName} />
 
 <main>
 	<slot />

@@ -20,3 +20,7 @@ export const handle = async ({ request, resolve }) => {
 
 	return response;
 };
+
+export function getSession(request) {
+	return cookie.parse(request.headers.cookie || '') || null;
+}
