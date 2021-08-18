@@ -1,7 +1,7 @@
 <script context="module">
 	export async function load({ fetch }) {
 		const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
-		console.log('running load function');
+		console.log('running load function in learn');
 		const sentenceApiCall = fetch(`${BASE_URL}/sentences`);
 		const wordsApiCall = fetch(`${BASE_URL}/words`);
 		const response = await Promise.all([sentenceApiCall, wordsApiCall]);
@@ -45,20 +45,7 @@
 		}
 	});
 	export let data;
-	const allSentences = data[0].map((sentence) => {
-		return {
-			id: sentence.id,
-			firstSentence: sentence.firstSentence,
-			secondSentence: sentence.secondSentence
-		};
-	});
-	const allWords = data[1].map((word) => {
-		return {
-			id: word.id,
-			firstWord: word.firstWord,
-			secondWord: word.secondWord
-		};
-	});
+	const [allSentences, allWords] = data;
 	let sentence = getRandom(allSentences);
 	let wordsInSentence = getOptions(sentence, allWords);
 
