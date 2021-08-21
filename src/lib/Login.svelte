@@ -1,5 +1,4 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { setCookie } from '../utils/cookie.js';
 	export let toggleShowLogin;
 	let email = '';
@@ -34,7 +33,7 @@
 				{ jwt: data.jwt, userId: data.user.id, userName: data.user.username },
 				30
 			);
-			goto('/');
+			window.location = '/';
 		}
 	};
 </script>

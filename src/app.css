@@ -15,6 +15,7 @@
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
 	--button-background: rgb(105, 128, 243);
+	--button-border: rgb(105, 128, 243);
 }
 
 body {
