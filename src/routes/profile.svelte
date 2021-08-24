@@ -26,12 +26,20 @@
 	import { deleteCookie } from '../utils/cookie';
 	export let userName;
 	export let data;
-	let showAllWords = false;
-	let showAllSentences = false;
-	const [allSentences, allWords] = data;
+	let [allSentences, allWords] = data;
 	const handleLogout = () => {
 		deleteCookie('userToken');
 		window.location = '/';
+	};
+	const refreshWords = async () => {
+		const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
+		const wordsApiCall = await fetch(`${BASE_URL}/words?userRef.username=${userName}`);
+		allWords = await wordsApiCall.json();
+	};
+	const refreshSentences = async () => {
+		const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
+		const sentenceApiCall = fetch(`${BASE_URL}/sentences?userRef.username=${userName}`);
+		allSentences = await sentenceApiCall.json();
 	};
 </script>
 
@@ -39,18 +47,6 @@
 	<h2>Profile Info</h2>
 	<button on:click={handleLogout}>Logout</button>
 	<p>Username = {userName}</p>
-	<Accordion data={allSentences} header="All Sentences" />
-	<Accordion data={allWords} header="All Words" />
-	<!-- <h2>All Sentences</h2>
-	<ul>
-		{#each allSentences as sentence}
-			<SentenceRow {sentence} />
-		{/each}
-	</ul>
-	<h2>All words</h2>
-	<ul>
-		{#each allWords as word}
-			<WordRow {word} />
-		{/each}
-	</ul> -->
+	<Accordion data={allSentences} header="All Sentences" {refreshWords} {refreshSentences} />
+	<Accordion data={allWords} header="All Words" {refreshWords} {refreshSentences} />
 </div>

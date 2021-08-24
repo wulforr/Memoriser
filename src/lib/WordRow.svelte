@@ -1,5 +1,7 @@
 <script>
 	export let word;
+	export let handleEdit;
+	export let handleDelete;
 	import deleteIcon from '$lib/icons/delete.svg';
 	import editIcon from '$lib/icons/edit.svg';
 </script>
@@ -9,8 +11,8 @@
 		{word.firstWord}
 	</p>
 	<div class="actions">
-		<img src={editIcon} alt="Edit" />
-		<img src={deleteIcon} alt="Delete" />
+		<img src={editIcon} alt="Edit" on:click={handleEdit} />
+		<img src={deleteIcon} alt="Delete" on:click={handleDelete} />
 	</div>
 </div>
 

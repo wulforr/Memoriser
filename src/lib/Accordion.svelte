@@ -5,46 +5,105 @@
 	import { getCookie } from '../utils/cookie.js';
 	export let data;
 	export let header;
-	let modalHeading = header === 'All Sentences' ? 'Add Sentence' : 'Add Word';
+	export let refreshWords;
+	export let refreshSentences;
+	const isSentence = header === 'All Sentences';
+	let modalHeading = isSentence ? 'Add Sentence' : 'Add Word';
 	let isOpen = false;
 	let isModalShown = false;
 	let input = '';
 	let translatedInput = '';
 	let modalBackdropRef;
-	const toggleModal = () => (isModalShown = !isModalShown);
+	let modalSubmitBtnText = 'Submit';
+	let itemId = '';
+	let isEditing = false;
+	const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
 	const toggle = () => (isOpen = !isOpen);
-	const handleAddNew = () => {
-		toggleModal();
+	const refreshData = () => {
+		if (isSentence) {
+			refreshSentences();
+		} else {
+			refreshWords();
+		}
 	};
-	const handleSubmit = async () => {
-		toggleModal();
-		const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
-		const isSentence = header === 'All Sentences';
-		const addUrl = isSentence ? `${BASE_URL}/sentences` : `${BASE_URL}/words`;
+	const handleAddNew = () => {
+		modalSubmitBtnText = 'Submit';
+		isEditing = false;
+		isModalShown = true;
+	};
+	const handleEdit = (item) => {
+		console.log('item info', item);
+		modalSubmitBtnText = 'Submit';
+		input = isSentence ? item.firstSentence : item.firstWord;
+		translatedInput = isSentence ? item.secondSentence : item.secondWord;
+		itemId = item.id;
+		isEditing = true;
+		isModalShown = true;
+	};
+	const handleDelete = async (item) => {
 		const userInfo = getCookie('userToken');
-		const reqBody = isSentence
-			? {
-					firstSentence: input,
-					secondSentence: translatedInput,
-					userRef: userInfo.userId
-			  }
-			: {
-					firstWord: input,
-					secondWord: translatedInput,
-					userRef: userInfo.userId
-			  };
-		console.log('adding to url', addUrl);
-		const response = await fetch(addUrl, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.jwt}` },
-			body: JSON.stringify(reqBody)
+		const deleteUrl = isSentence
+			? `${BASE_URL}/sentences/${item.id}`
+			: `${BASE_URL}/words/${item.id}`;
+		const response = await fetch(deleteUrl, {
+			method: 'DELETE',
+			headers: { Authorization: `Bearer ${userInfo.jwt}` }
 		});
+		refreshData();
 		console.log('response', response);
 	};
 	const handleClose = (e) => {
 		if (e.target === modalBackdropRef) {
-			toggleModal();
+			isModalShown = false;
 		}
+	};
+	const handleSubmit = async () => {
+		modalSubmitBtnText = 'Submitting';
+		const userInfo = getCookie('userToken');
+		if (isEditing) {
+			const editUrl = isSentence
+				? `${BASE_URL}/sentences/${itemId}`
+				: `${BASE_URL}/words/${itemId}`;
+			const reqBody = isSentence
+				? {
+						firstSentence: input,
+						secondSentence: translatedInput
+				  }
+				: {
+						firstWord: input,
+						secondWord: translatedInput
+				  };
+			const response = await fetch(editUrl, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.jwt}` },
+				body: JSON.stringify(reqBody)
+			});
+			isModalShown = false;
+
+			console.log('response', response);
+		} else {
+			const addUrl = isSentence ? `${BASE_URL}/sentences` : `${BASE_URL}/words`;
+			const reqBody = isSentence
+				? {
+						firstSentence: input,
+						secondSentence: translatedInput,
+						userRef: userInfo.userId
+				  }
+				: {
+						firstWord: input,
+						secondWord: translatedInput,
+						userRef: userInfo.userId
+				  };
+			console.log('adding to url', addUrl);
+			const response = await fetch(addUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.jwt}` },
+				body: JSON.stringify(reqBody)
+			});
+			isModalShown = false;
+			console.log('response', response);
+		}
+		refreshData();
 	};
 </script>
 
@@ -69,9 +128,17 @@
 	<ul transition:slide={{ duration: 300 }}>
 		{#each data as item}
 			{#if item.firstSentence}
-				<SentenceRow sentence={item} />
+				<SentenceRow
+					sentence={item}
+					handleEdit={() => handleEdit(item)}
+					handleDelete={() => handleDelete(item)}
+				/>
 			{:else}
-				<WordRow word={item} />
+				<WordRow
+					word={item}
+					handleEdit={() => handleEdit(item)}
+					handleDelete={() => handleDelete(item)}
+				/>
 			{/if}
 		{/each}
 	</ul>
@@ -86,7 +153,7 @@
 		<h1>{modalHeading}</h1>
 		<input type="text" bind:value={input} placeholder="Enter Value" />
 		<input type="text" bind:value={translatedInput} placeholder="Enter Translated Value" />
-		<button on:click={handleSubmit}>Submit</button>
+		<button on:click={handleSubmit}>{modalSubmitBtnText}</button>
 	</div>
 </div>
 
