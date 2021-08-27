@@ -18,7 +18,7 @@ export const shuffleArray = (data) => {
 export const getOptions = (sentence, allWords) => {
 	let wordsInSentence = sentence.secondSentence.split(' ');
 	const sentenceLength = wordsInSentence.length;
-	while (wordsInSentence.length < 6 || wordsInSentence.length < sentenceLength + 2) {
+	while (wordsInSentence.length < sentenceLength + 1) {
 		const word = getRandom(allWords);
 		if (!wordsInSentence.includes(word.secondWord)) {
 			wordsInSentence.push(word.secondWord);

@@ -1,8 +1,6 @@
 <script context="module">
 	export async function load({ session }) {
-		console.log('running load function in layout due to session', session);
 		if (session) {
-			console.log('session in layout', session, JSON.parse(session.userToken).userName);
 			return {
 				props: {
 					userName: JSON.parse(session.userToken).userName

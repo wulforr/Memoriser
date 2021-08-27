@@ -1,18 +1,23 @@
 <script context="module">
-	export async function load({ fetch }) {
-		const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
-		console.log('running load function in learn');
-		const sentenceApiCall = fetch(`${BASE_URL}/sentences`);
-		const wordsApiCall = fetch(`${BASE_URL}/words`);
-		const response = await Promise.all([sentenceApiCall, wordsApiCall]);
-		// console.log('response', response);
-		const data = await Promise.all(response.map((r) => r.json()));
+	export async function load({ fetch, session }) {
+		if (session) {
+			const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
 
-		return {
-			props: {
-				data
-			}
-		};
+			const userName = JSON.parse(session.userToken).userName;
+			const sentenceApiCall = fetch(`${BASE_URL}/sentences?userRef.username=${userName}`);
+			const wordsApiCall = fetch(`${BASE_URL}/words?userRef.username=${userName}`);
+			const response = await Promise.all([sentenceApiCall, wordsApiCall]);
+			const data = await Promise.all(response.map((r) => r.json()));
+			return {
+				props: {
+					data
+				}
+			};
+		} else
+			return {
+				status: 302,
+				redirect: '/auth'
+			};
 	}
 </script>
 
@@ -21,11 +26,6 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-	import { onDestroy } from 'svelte';
-
-	onDestroy(() => {
-		console.log('destroyin learn');
-	});
 
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
@@ -45,11 +45,19 @@
 		}
 	});
 	export let data;
-	const [allSentences, allWords] = data;
-	let sentence = getRandom(allSentences);
-	let wordsInSentence = getOptions(sentence, allWords);
-
+	let sentence = null;
+	let wordsInSentence = null;
 	let ans = [];
+	let isChecked = false;
+	let isCorrect = false;
+	let allSentences = null;
+	let allWords = null;
+	if (data && data[0].length && data[1].length) {
+		[allSentences, allWords] = data;
+		sentence = getRandom(allSentences);
+		wordsInSentence = getOptions(sentence, allWords);
+	}
+
 	const handleOptionsWordClick = (word) => {
 		ans = [...ans, word];
 		wordsInSentence = wordsInSentence.filter((ele) => ele !== word);
@@ -58,8 +66,6 @@
 		ans = ans.filter((ele) => ele !== word);
 		wordsInSentence = [...wordsInSentence, word];
 	};
-	let isChecked = false;
-	let isCorrect = false;
 	const checkAns = () => {
 		let ansString = ans.map((ele) => ele.name).join(' ');
 		if (ansString.toLowerCase() === sentence.secondSentence.toLowerCase()) {
@@ -77,45 +83,53 @@
 	};
 </script>
 
-<section>
-	<h2>{sentence.firstSentence}</h2>
-	<div class="selected">
-		{#each ans as wordObj (wordObj.id)}
-			<div
-				in:receive|local={{ key: wordObj.id }}
-				out:send|local={{ key: wordObj.id }}
-				animate:flip={{ duration: 200 }}
-				on:click={() => handleAnsWordClick(wordObj)}
-			>
-				{wordObj.name}
+{#if data}
+	{#if data[0].length && data[1].length}
+		<section>
+			<h2>{sentence.firstSentence}</h2>
+			<div class="selected">
+				{#each ans as wordObj (wordObj.id)}
+					<div
+						in:receive|local={{ key: wordObj.id }}
+						out:send|local={{ key: wordObj.id }}
+						animate:flip={{ duration: 200 }}
+						on:click={() => handleAnsWordClick(wordObj)}
+					>
+						{wordObj.name}
+					</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
-	<div class="options">
-		{#each wordsInSentence as wordObj (wordObj.id)}
-			<div
-				in:receive|local={{ key: wordObj.id }}
-				out:send|local={{ key: wordObj.id }}
-				animate:flip={{ duration: 200 }}
-				on:click={() => handleOptionsWordClick(wordObj)}
-			>
-				{wordObj.name}
+			<div class="options">
+				{#each wordsInSentence as wordObj (wordObj.id)}
+					<div
+						in:receive|local={{ key: wordObj.id }}
+						out:send|local={{ key: wordObj.id }}
+						animate:flip={{ duration: 200 }}
+						on:click={() => handleOptionsWordClick(wordObj)}
+					>
+						{wordObj.name}
+					</div>
+				{/each}
 			</div>
-		{/each}
-	</div>
-	{#if isChecked}
-		{#if isCorrect}
-			<div class="correctAns">Congratulations! Correct Answer</div>
-		{:else}
-			<div class="wrongAns">
-				Oops Wrong Answer, The correct answer is - {sentence.secondSentence}
-			</div>
-		{/if}
-		<button on:click={handleNext}>Next</button>
+			{#if isChecked}
+				{#if isCorrect}
+					<div class="correctAns">Congratulations! Correct Answer</div>
+				{:else}
+					<div class="wrongAns">
+						Oops Wrong Answer, The correct answer is - {sentence.secondSentence}
+					</div>
+				{/if}
+				<button on:click={handleNext}>Next</button>
+			{:else}
+				<button on:click={checkAns}>Check</button>
+			{/if}
+		</section>
 	{:else}
-		<button on:click={checkAns}>Check</button>
+		<section>Please add words and sentences</section>
 	{/if}
-</section>
+{:else}
+	<section>Please login</section>
+{/if}
 
 <style>
 	section {

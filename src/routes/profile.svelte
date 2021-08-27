@@ -1,14 +1,11 @@
 <script context="module">
 	export async function load({ session, fetch }) {
 		if (session) {
-			console.log('running load function in profile');
 			const userName = JSON.parse(session.userToken).userName;
-			console.log('username', userName);
 			const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
 			const sentenceApiCall = fetch(`${BASE_URL}/sentences?userRef.username=${userName}`);
 			const wordsApiCall = fetch(`${BASE_URL}/words?userRef.username=${userName}`);
 			const response = await Promise.all([sentenceApiCall, wordsApiCall]);
-			console.log('response', response);
 			const data = await Promise.all(response.map((r) => r.json()));
 			return {
 				props: {

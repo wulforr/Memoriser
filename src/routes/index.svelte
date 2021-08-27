@@ -3,7 +3,6 @@
 </script>
 
 <script>
-	import Counter from '$lib/Counter.svelte';
 	import { goto } from '$app/navigation';
 </script>
 
@@ -15,7 +14,6 @@
 	<h1>Memoriser</h1>
 	<h2>An app to help you learn and remember german language by repititive learning.</h2>
 	<button on:click={() => goto('learn')}>Let's get started</button>
-	<Counter />
 </section>
 
 <style>

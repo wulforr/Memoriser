@@ -32,7 +32,6 @@
 		isModalShown = true;
 	};
 	const handleEdit = (item) => {
-		console.log('item info', item);
 		modalSubmitBtnText = 'Submit';
 		input = isSentence ? item.firstSentence : item.firstWord;
 		translatedInput = isSentence ? item.secondSentence : item.secondWord;
@@ -50,7 +49,6 @@
 			headers: { Authorization: `Bearer ${userInfo.jwt}` }
 		});
 		refreshData();
-		console.log('response', response);
 	};
 	const handleClose = (e) => {
 		if (e.target === modalBackdropRef) {
@@ -79,8 +77,6 @@
 				body: JSON.stringify(reqBody)
 			});
 			isModalShown = false;
-
-			console.log('response', response);
 		} else {
 			const addUrl = isSentence ? `${BASE_URL}/sentences` : `${BASE_URL}/words`;
 			const reqBody = isSentence
@@ -94,14 +90,12 @@
 						secondWord: translatedInput,
 						userRef: userInfo.userId
 				  };
-			console.log('adding to url', addUrl);
 			const response = await fetch(addUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userInfo.jwt}` },
 				body: JSON.stringify(reqBody)
 			});
 			isModalShown = false;
-			console.log('response', response);
 		}
 		refreshData();
 	};

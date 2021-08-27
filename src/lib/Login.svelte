@@ -1,5 +1,6 @@
 <script>
 	import { setCookie } from '../utils/cookie.js';
+	import axios from 'axios';
 	export let toggleShowLogin;
 	let email = '';
 	let password = '';
@@ -16,24 +17,26 @@
 			error = 'Password must be greater than 4 characters';
 			return;
 		}
-		console.log(email, password);
-		const response = await fetch('https://memoriser-strapiapi.el.r.appspot.com/auth/local', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				identifier: email,
-				password
-			})
-		});
-		const data = await response.json();
-		console.log('response', response, data);
-		if (response.status === 200) {
+		try {
+			error = '';
+			const { data } = await axios({
+				url: 'https://memoriser-strapiapi.el.r.appspot.com/auth/local',
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				data: JSON.stringify({
+					identifier: email,
+					password
+				})
+			});
 			setCookie(
 				'userToken',
 				{ jwt: data.jwt, userId: data.user.id, userName: data.user.username },
 				30
 			);
 			window.location = '/';
+			// }
+		} catch (err) {
+			error = 'Username or password is incorrect';
 		}
 	};
 </script>
