@@ -1,38 +1,33 @@
-# create-svelte
+# Memoriser
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+A webapp to help learn a language using repetitive learning.
+### Live Demo
 
-## Creating a project
+For live demo check-out [https://pricewatcher.surge.sh/](https://pricewatcher.surge.sh/)
 
-If you're seeing this, you've probably already done this step. Congrats!
+### Prerequisites
 
-```bash
-# create a new project in the current directory
-npm init svelte@next
+<ul>
+<li>Node</li>
+<li>npm</li>
+<li>git</li>
+</ul>
 
-# create a new project in my-app
-npm init svelte@next my-app
-```
+### Get Started
 
-> Note: the `@next` is temporary
+- clone the repo
+- go into the repo `cd Memoriser`
+- Install dependencies `npm install`
+- start the server `npm run dev`
 
-## Developing
+### Features
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- Users can add a word and its translated meaning
+- Users can add a sentence and its translated sentence
+- Once the sentences are added users can get a random sentence and have to choose from translated words to create translated sentence.
+- Users can create their account and save their progress.
 
-```bash
-npm run dev
+### Technologies used
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
-
-```bash
-npm run build
-```
-
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+Svelte has been used to make the frontend of the project.
+Strapi is used for managing backend.
