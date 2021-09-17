@@ -3,7 +3,7 @@
 A webapp to help learn a language using repetitive learning.
 ### Live Demo
 
-For live demo check-out [https://pricewatcher.surge.sh/](https://pricewatcher.surge.sh/)
+For live demo check-out [https://memoriser.vercel.app/](https://memoriser.vercel.app/)
 
 ### Prerequisites
 
