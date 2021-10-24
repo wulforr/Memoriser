@@ -19,7 +19,7 @@
 		try {
 			signUpBtnText = 'Signing Up';
 			const { data } = await axios({
-				url: 'https://memoriser-strapiapi.el.r.appspot.com/auth/local/register',
+				url: 'https://memoriser-strapi.herokuapp.com/auth/local/register',
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				data: JSON.stringify({

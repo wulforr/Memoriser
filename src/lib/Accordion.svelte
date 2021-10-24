@@ -17,7 +17,7 @@
 	let modalSubmitBtnText = 'Submit';
 	let itemId = '';
 	let isEditing = false;
-	const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
+	const BASE_URL = 'https://memoriser-strapi.herokuapp.com';
 	const toggle = () => (isOpen = !isOpen);
 	const refreshData = () => {
 		if (isSentence) {

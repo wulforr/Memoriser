@@ -1,7 +1,7 @@
 <script context="module">
 	export async function load({ fetch, session }) {
 		if (session) {
-			const BASE_URL = 'https://memoriser-strapiapi.el.r.appspot.com';
+			const BASE_URL = 'https://memoriser-strapi.herokuapp.com';
 
 			const userName = JSON.parse(session.userToken).userName;
 			const sentenceApiCall = fetch(`${BASE_URL}/sentences?userRef.username=${userName}`);

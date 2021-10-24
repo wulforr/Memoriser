@@ -20,7 +20,7 @@
 		try {
 			error = '';
 			const { data } = await axios({
-				url: 'https://memoriser-strapiapi.el.r.appspot.com/auth/local',
+				url: 'https://memoriser-strapi.herokuapp.com/auth/local',
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				data: JSON.stringify({
